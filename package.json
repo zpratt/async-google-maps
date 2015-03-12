@@ -1,12 +1,13 @@
 {
   "name": "async-google-maps",
   "version": "0.1.0",
-  "description": "Asynchronous loading and creating google maps",
+  "description": "Asynchronous loading and creation of google maps",
   "engines": {
     "node": ">=0.12"
   },
-  "main": "index.js",
+  "main": "dist/map-loader.js",
   "scripts": {
+    "build": "rm -rf dist && mkdir dist && node_modules/.bin/babel lib/map-loader.js > dist/map-loader.js",
     "test": "node_modules/.bin/mocha --compilers js:babel/register -r ./test/helpers/jsdom.js"
   },
   "repository": {
