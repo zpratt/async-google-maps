@@ -13,6 +13,7 @@ function triggerDocumentReady() {
     document.dispatchEvent(event);
 }
 
+/*global expect MapLoader */
 describe('Google Maps Loader Test Suite', function () {
     it('should expose a global callback that the main google maps module will invoke once it is fully loaded', function () {
         global[EXPECTED_GLOBAL_CALLBACK]();
