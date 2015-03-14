@@ -85,12 +85,16 @@ describe('Google Maps Loader Test Suite', function () {
     });
 
     it('should add the google maps script to the dom', function () {
+        var scriptEl;
+
         MapLoader.load(loadOptions);
         expect(document.head.querySelector('script')).to.equal(null);
 
         triggerDocumentReady();
 
-        expect(document.head.querySelector('script').src).to.equal(expectedUrl);
+        scriptEl = document.head.querySelector('script');
+        expect(scriptEl.src).to.equal(expectedUrl);
+        expect(scriptEl.type).to.equal('text/javascript');
     });
 
     it('should resolve the promise once google maps is loaded and the global callback is invoked', function () {
