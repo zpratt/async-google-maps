@@ -7,7 +7,7 @@ Asynchronous loading and creation of google maps
 
 I wrote this module to have the simplest possible public API and to handle the common case of waiting to add things to the map until it is `idle`. It is also targeted at making the creation of multiple map instances easier to manage, since each call to `create` will return a promise. There is [another library](https://github.com/sakren/node-google-maps) you can use if you don't like mine.
 
-Additionally, I have focused on code readability and test quality. TDD is a passion of mine.
+Additionally, I have focused on code readability, test quality, and attempted to make this an easy module to TDD with as a dependency. You can easily stub the API, instead of having to verify properties of the module itself. TDD is a passion of mine.
 
 ### Not fully baked yet
 
