@@ -7,8 +7,9 @@
   },
   "main": "dist/map-loader.js",
   "scripts": {
-    "build": "npm test && rm -rf dist && mkdir dist && node_modules/.bin/babel lib/map-loader.js > dist/map-loader.js",
-    "test": "node_modules/.bin/eslint test/ lib/ && node_modules/.bin/mocha --compilers js:babel/register -r ./test/helpers/jsdom.js"
+    "compile": "rm -rf dist && mkdir dist && node_modules/.bin/babel lib/map-loader.js > dist/map-loader.js",
+    "build": "npm test && npm run compile",
+    "test": "node_modules/.bin/eslint test/ lib/ && node_modules/.bin/mocha -r ./test/helpers/jsdom.js"
   },
   "repository": {
     "type": "git",
@@ -30,6 +31,6 @@
     "eslint": "^0.16.2",
     "jsdom": "^4.0.2",
     "mocha": "^2.2.1",
-    "sinon": "^1.13.0"
+    "sinon": "^1.14.0"
   }
 }
