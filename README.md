@@ -3,13 +3,27 @@ Asynchronous loading and creation of google maps
 
 [![Build Status](https://travis-ci.org/zpratt/async-google-maps.svg)](https://travis-ci.org/zpratt/async-google-maps)
 
+## Why use this module?
+
+I wrote this module to have the simplest possible public API and to handle the common case of waiting to add things to the map until it is `idle`. It is also targeted at making the creation of multiple map instances easier to manage, since each call to `create` will return a promise. There is [another library](https://github.com/sakren/node-google-maps) you can use if you don't like mine.
+
+Additionally, I have focused on code readability and test quality. TDD is a passion of mine.
+
+### Not fully baked yet
+
+I have yet to include the options for the business version, but I expect to include that in the next release.
+
 ## Running tests
+
+This module is 100% test-driven. Please feel free to run the tests and critique them.
 
 1. Install io.js (needed for jsdom)
 - `npm i`
 - `npm test`
 
 ## Usage
+
+This is a pure commonjs module with no production dependencies. I recommend using either [webpack](http://webpack.github.io/docs/) or [browserify](https://github.com/substack/node-browserify) to build.
 
 ```javascript
 
