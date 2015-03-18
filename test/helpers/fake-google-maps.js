@@ -1,5 +1,17 @@
 'use strict';
 
+function OverlayView() {
+    return;
+}
+
+OverlayView.prototype.getPanes = function () {
+    return;
+};
+
+OverlayView.prototype.getProjection = function () {
+    return;
+};
+
 var fakeGoogleMapsApi = {
     maps: {
         Map: function () {
@@ -9,7 +21,11 @@ var fakeGoogleMapsApi = {
             addListenerOnce: function () {
                 return;
             }
-        }
+        },
+        LatLng: function () {
+
+        },
+        OverlayView: OverlayView
     }
 };
 
