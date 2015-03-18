@@ -2,6 +2,7 @@
 Asynchronous loading and creation of google maps
 
 [![Build Status](https://travis-ci.org/zpratt/async-google-maps.svg)](https://travis-ci.org/zpratt/async-google-maps)
+[![npm](https://img.shields.io/npm/v/async-google-maps.svg)](https://www.npmjs.com/package/async-google-maps)
 
 ## Why use this module?
 
