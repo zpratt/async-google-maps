@@ -1,8 +1,11 @@
 'use strict';
 
 var fakeGoogle = require('./helpers/fake-google-maps.js'),
-    MapLoader = require('../lib/map-loader'),
+    MapLoader,
+
     SyncPromise = require('./helpers/sync-promise.js'),
+    path = require('path'),
+
     expect = require('chai').expect,
     sinon = require('sinon'),
 
@@ -20,13 +23,11 @@ var fakeGoogle = require('./helpers/fake-google-maps.js'),
     fakeMapOptions,
     mapContainer,
 
+    documentReadyCallback,
     mapIdleCallback;
 
 function triggerDocumentReady() {
-    var event = document.createEvent('HTMLEvents');
-
-    event.initEvent('DOMContentLoaded', false, false);
-    document.dispatchEvent(event);
+    documentReadyCallback();
 }
 
 function givenGoogleMapsLibHasLoaded() {
@@ -46,6 +47,12 @@ function defineStubs() {
     sandbox.stub(fakeGoogle.maps.event, 'addListenerOnce', function (mapInstance, eventName, callback) {
         if (mapInstance === fakeMapInstance && eventName === 'idle') {
             mapIdleCallback = callback;
+        }
+    });
+
+    sandbox.stub(document, 'addEventListener', function (event, callback) {
+        if (event === 'DOMContentLoaded') {
+            documentReadyCallback = callback;
         }
     });
 }
@@ -75,13 +82,21 @@ describe('Google Maps Loader Test Suite', function () {
 
         defineFakeData();
         defineStubs();
+
+        MapLoader = require('../lib/map-loader');
     });
 
     afterEach(function () {
+        var cachedModule = path.join(__dirname, '..', 'lib', 'map-loader.js');
+
         sandbox.restore();
 
         SyncPromise.unsetSandbox();
         mapIdleCallback = null;
+        documentReadyCallback = null;
+        document.head.innerHTML = '';
+
+        delete require.cache[cachedModule];
     });
 
     it('should add the google maps script to the dom', function () {
@@ -129,5 +144,24 @@ describe('Google Maps Loader Test Suite', function () {
 
         sinon.assert.calledOnce(mapIdlePromise.resolve);
         sinon.assert.calledWith(mapIdlePromise.resolve, fakeMapInstance);
+    });
+
+    it('should expose a hook to know when the google maps API is ready', function () {
+        var mapLoadedPromise = MapLoader.loaded,
+            promiseFromLoad = MapLoader.load(loadOptions);
+
+        expect(mapLoadedPromise).to.equal(promiseFromLoad);
+    });
+
+    it('should only load the google maps API once', function () {
+        sinon.assert.calledOnce(global.Promise);
+        global.Promise.reset();
+
+        MapLoader.load(loadOptions);
+        triggerDocumentReady();
+        MapLoader.load(loadOptions);
+
+        sinon.assert.notCalled(global.Promise);
+        expect(document.getElementsByTagName('script')).to.have.length(1);
     });
 });
