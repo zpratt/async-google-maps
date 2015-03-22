@@ -5,7 +5,7 @@
   "engines": {
     "node": ">=0.12"
   },
-  "main": "lib/map-loader.js",
+  "main": "index.js",
   "scripts": {
     "test": "node_modules/.bin/eslint test/ lib/ && node_modules/.bin/mocha -r ./test/helpers/jsdom.js"
   },
