@@ -55,14 +55,18 @@ function setupStubs() {
 
     sandbox.stub(fakeGoogleMaps.maps.OverlayView.prototype, 'getProjection')
         .returns({
-            fromLatLngToDivPixel: sandbox.stub()
-                .withArgs(fakeLatLng)
-                .returns(projectedLatLng)
+            fromLatLngToDivPixel: function (latLng) {
+                if (latLng === fakeLatLng) {
+                    return projectedLatLng;
+                }
+            }
         });
 
-    sandbox.stub(fakeGoogleMaps.maps, 'LatLng')
-        .withArgs(latLngLiteral)
-        .returns(fakeLatLng);
+    sandbox.stub(fakeGoogleMaps.maps, 'LatLng', function (lat, lng) {
+        if (lat === latLngLiteral.lat && lng === latLngLiteral.lng) {
+            return fakeLatLng;
+        }
+    });
 }
 describe('Base Overlay Test Suite', function () {
     beforeEach(function () {
