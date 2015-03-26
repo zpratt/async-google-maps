@@ -46,6 +46,10 @@ MapLoader.create(
 );
 ```
 
+## Documentation
+
+API documentation can be found [here](http://zpratt.github.io/async-google-maps/docs/async-google-maps/0.1.1/index.html).
+
 ### Promises
 
 This library leverages the ES6 promise implementation, which is currently [available in most modern browsers](http://caniuse.com/#feat=promises). If you wish to use it with browsers that do not support the ES6 promise implementation, then I recommend using [a polyfill](https://github.com/jakearchibald/es6-promise).
