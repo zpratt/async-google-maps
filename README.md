@@ -27,7 +27,7 @@ This is a pure commonjs module with no production dependencies. I recommend usin
 
 ```javascript
 
-var MapLoader = require('async-google-maps');
+var MapLoader = require('async-google-maps').MapLoader;
 
 MapLoader.load({
     key: 'some-api-key',
