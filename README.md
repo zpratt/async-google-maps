@@ -48,7 +48,7 @@ MapLoader.create(
 
 ## Documentation
 
-API documentation can be found [here](http://zpratt.github.io/async-google-maps/docs/async-google-maps/0.1.1/index.html).
+API documentation can be found [here](http://zpratt.github.io/async-google-maps/docs/async-google-maps/0.2.0/index.html).
 
 ### Promises
 
