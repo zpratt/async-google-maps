@@ -25,26 +25,7 @@ This module is 100% test-driven. Please feel free to run the tests and critique 
 
 This is a pure commonjs module with no production dependencies. I recommend using either [webpack](http://webpack.github.io/docs/) or [browserify](https://github.com/substack/node-browserify) to build.
 
-```javascript
-
-var MapLoader = require('async-google-maps').MapLoader;
-
-MapLoader.load({
-    key: 'some-api-key',
-    version: '3.20'
-});
-
-MapLoader.create(
-    document.querySelector('.map-container'),
-    {
-        center: {
-            lat: 40.0,
-            lng: -90.0
-        },
-        zoom: 7
-    }
-);
-```
+See the [wiki](https://github.com/zpratt/async-google-maps/wiki) for usage examples.
 
 ## Documentation
 
