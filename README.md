@@ -27,7 +27,7 @@ This is a pure commonjs module with no production dependencies. I recommend usin
 
 ```javascript
 
-var MapLoader = require('async-google-maps');
+var MapLoader = require('async-google-maps').MapLoader;
 
 MapLoader.load({
     key: 'some-api-key',
@@ -45,6 +45,10 @@ MapLoader.create(
     }
 );
 ```
+
+## Documentation
+
+API documentation can be found [here](http://zpratt.github.io/async-google-maps/docs/async-google-maps/0.1.1/index.html).
 
 ### Promises
 
