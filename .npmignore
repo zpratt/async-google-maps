@@ -1,5 +1,7 @@
 test
+.idea
 .travis.yml
 .editorconfig
 .eslintrc
 .gitignore
+conf.json
