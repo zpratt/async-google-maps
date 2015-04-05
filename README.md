@@ -18,8 +18,8 @@ I have yet to include the options for the business version, but I expect to incl
 This module is 100% test-driven. Please feel free to run the tests and critique them.
 
 1. Install io.js (needed for jsdom)
-- `npm i`
-- `npm test`
+2. `npm i`
+3. `npm test`
 
 ## Usage
 
