@@ -21,6 +21,16 @@ var fakeGoogleMaps = require('./helpers/fake-google-maps'),
     overlayOptions,
     overlayInstance;
 
+function setDimensionsOfOverlayElement() {
+    overlayElement.style.height = initialOffsetHeight + 'px';
+    overlayElement.style.width = initialOffsetWidth + 'px';
+}
+
+function givenTheOverlayIsAddedToTheDom() {
+    overlayInstance.onAdd();
+    setDimensionsOfOverlayElement();
+}
+
 function calculateTop() {
     return projectedLatLng.y - initialOffsetHeight + 'px';
 }
@@ -55,15 +65,9 @@ function setFakeData() {
     };
 }
 
-function setDimensionsOfOverlayElement() {
-    overlayElement.style.height = initialOffsetHeight + 'px';
-    overlayElement.style.width = initialOffsetWidth + 'px';
-}
-
 function setupDom() {
     overlayPaneElement = document.createElement('div');
     overlayElement = document.createElement('div');
-    setDimensionsOfOverlayElement();
 }
 
 function setupStubs() {
@@ -132,6 +136,8 @@ describe('Base Overlay Test Suite', function () {
         expect(overlayElement.style.top).to.equal('');
         expect(overlayElement.style.left).to.equal('');
 
+        givenTheOverlayIsAddedToTheDom();
+
         overlayInstance.draw();
 
         expect(overlayElement.style.top).to.equal(expectedTop);
@@ -151,6 +157,8 @@ describe('Base Overlay Test Suite', function () {
             expectedLeft = calculateLeft();
 
         overlayInstance.cacheDimensions();
+
+        givenTheOverlayIsAddedToTheDom();
         overlayInstance.draw();
 
         generateHeightAndWidth();
@@ -159,5 +167,16 @@ describe('Base Overlay Test Suite', function () {
         overlayInstance.draw();
         expect(overlayElement.style.top).to.equal(expectedTop);
         expect(overlayElement.style.left).to.equal(expectedLeft);
+    });
+
+    it('should not cache the dimensions until after the overlay has been added to the DOM and drawn', function () {
+        var expectedTop = calculateTop(),
+            expectedLeft = calculateLeft();
+
+        overlayInstance.cacheDimensions();
+        overlayInstance.draw();
+
+        expect(overlayElement.style.top).to.not.equal(expectedTop);
+        expect(overlayElement.style.left).to.not.equal(expectedLeft);
     });
 });
