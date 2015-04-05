@@ -26,7 +26,7 @@
   "homepage": "https://github.com/zpratt/async-google-maps",
   "devDependencies": {
     "chai": "^2.1.1",
-    "eslint": "^0.16.2",
+    "eslint": "^0.18.0",
     "jsdoc": "^3.3.0-beta3",
     "jsdom": "^4.0.2",
     "mocha": "^2.2.1",
