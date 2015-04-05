@@ -21,13 +21,36 @@ var fakeGoogleMaps = require('./helpers/fake-google-maps'),
     overlayOptions,
     overlayInstance;
 
+function setDimensionsOfOverlayElement() {
+    overlayElement.style.height = initialOffsetHeight + 'px';
+    overlayElement.style.width = initialOffsetWidth + 'px';
+}
+
+function givenTheOverlayIsAddedToTheDom() {
+    overlayInstance.onAdd();
+    setDimensionsOfOverlayElement();
+}
+
+function calculateTop() {
+    return projectedLatLng.y - initialOffsetHeight + 'px';
+}
+
+function calculateLeft() {
+    return projectedLatLng.x - Math.floor(initialOffsetWidth / 2) + 'px';
+}
+
 function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
 
-function setFakeData() {
+function generateHeightAndWidth() {
     initialOffsetHeight = randomInt(20, 1000);
     initialOffsetWidth = randomInt(20, 1000);
+}
+
+function setFakeData() {
+    generateHeightAndWidth();
+
     latLngLiteral = {
         lat: 0.0,
         lng: 0.0
@@ -41,12 +64,12 @@ function setFakeData() {
         y: initialOffsetHeight + randomInt(1, 100)
     };
 }
+
 function setupDom() {
     overlayPaneElement = document.createElement('div');
     overlayElement = document.createElement('div');
-    overlayElement.style.height = initialOffsetHeight + 'px';
-    overlayElement.style.width = initialOffsetWidth + 'px';
 }
+
 function setupStubs() {
     sandbox.stub(fakeGoogleMaps.maps.OverlayView.prototype, 'getPanes')
         .returns({
@@ -68,6 +91,7 @@ function setupStubs() {
         }
     });
 }
+
 describe('Base Overlay Test Suite', function () {
     beforeEach(function () {
         sandbox = sinon.sandbox.create();
@@ -106,11 +130,13 @@ describe('Base Overlay Test Suite', function () {
     });
 
     it('should position the overlay once the map is idle', function () {
-        var expectedTop = projectedLatLng.y - initialOffsetHeight + 'px',
-            expectedLeft = projectedLatLng.x - Math.floor(initialOffsetWidth / 2) + 'px';
+        var expectedTop = calculateTop(),
+            expectedLeft = calculateLeft();
 
         expect(overlayElement.style.top).to.equal('');
         expect(overlayElement.style.left).to.equal('');
+
+        givenTheOverlayIsAddedToTheDom();
 
         overlayInstance.draw();
 
@@ -124,5 +150,33 @@ describe('Base Overlay Test Suite', function () {
         overlayInstance.onRemove();
 
         expect(overlayPaneElement.contains(overlayElement)).to.equal(false);
+    });
+
+    it('should cache the dimensions of the associated DOM element', function () {
+        var expectedTop = calculateTop(),
+            expectedLeft = calculateLeft();
+
+        overlayInstance.cacheDimensions();
+
+        givenTheOverlayIsAddedToTheDom();
+        overlayInstance.draw();
+
+        generateHeightAndWidth();
+        setDimensionsOfOverlayElement();
+
+        overlayInstance.draw();
+        expect(overlayElement.style.top).to.equal(expectedTop);
+        expect(overlayElement.style.left).to.equal(expectedLeft);
+    });
+
+    it('should not cache the dimensions until after the overlay has been added to the DOM and drawn', function () {
+        var expectedTop = calculateTop(),
+            expectedLeft = calculateLeft();
+
+        overlayInstance.cacheDimensions();
+        overlayInstance.draw();
+
+        expect(overlayElement.style.top).to.not.equal(expectedTop);
+        expect(overlayElement.style.left).to.not.equal(expectedLeft);
     });
 });
