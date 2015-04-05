@@ -12,6 +12,11 @@ var BaseOverlayFactory,
     BaseOverlaySpy,
     sandbox;
 
+function resolveMapPromiseAndGetOverlayInstance() {
+    mapLoadedSpy.firstCall.yield();
+
+    return BaseOverlaySpy.returnValues[0];
+}
 describe('Base Overlay Factory Test Suite', function () {
     beforeEach(function () {
         sandbox = sinon.sandbox.create();
@@ -24,7 +29,8 @@ describe('Base Overlay Factory Test Suite', function () {
         mapLoadedSpy = sandbox.spy();
         BaseOverlaySpy = sandbox.spy(function () {
             return {
-                setMap: sandbox.spy()
+                setMap: sandbox.spy(),
+                cacheDimensions: sandbox.spy()
             };
         });
 
@@ -57,11 +63,27 @@ describe('Base Overlay Factory Test Suite', function () {
         var fakeOverlayInstance;
 
         BaseOverlayFactory.create(fakeOptions);
-        mapLoadedSpy.firstCall.yield();
-
-        fakeOverlayInstance = BaseOverlaySpy.returnValues[0];
+        fakeOverlayInstance = resolveMapPromiseAndGetOverlayInstance();
 
         sinon.assert.calledOnce(fakeOverlayInstance.setMap);
         sinon.assert.calledWith(fakeOverlayInstance.setMap, fakeMap);
+    });
+
+    it('should tell the overlay instance to cache its dimensions when the option is set', function () {
+        var fakeOverlayInstance;
+
+        fakeOptions.cacheDimensions = true;
+
+        BaseOverlayFactory.create(fakeOptions);
+        fakeOverlayInstance = resolveMapPromiseAndGetOverlayInstance();
+        sinon.assert.calledOnce(fakeOverlayInstance.cacheDimensions);
+    });
+
+    it('should not tell the overlay instance to cache its dimensions when the option is not set', function () {
+        var fakeOverlayInstance;
+
+        BaseOverlayFactory.create(fakeOptions);
+        fakeOverlayInstance = resolveMapPromiseAndGetOverlayInstance();
+        sinon.assert.notCalled(fakeOverlayInstance.cacheDimensions);
     });
 });
