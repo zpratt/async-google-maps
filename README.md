@@ -30,7 +30,7 @@ See the [wiki](https://github.com/zpratt/async-google-maps/wiki) for usage examp
 
 ## Documentation
 
-API documentation can be found [here](http://zpratt.github.io/async-google-maps/docs/async-google-maps/0.2.0/index.html).
+API documentation can be found [here](http://zpratt.github.io/async-google-maps/docs/async-google-maps/0.2.2/index.html).
 
 ### Promises
 
