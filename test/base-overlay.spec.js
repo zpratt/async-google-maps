@@ -117,4 +117,12 @@ describe('Base Overlay Test Suite', function () {
         expect(overlayElement.style.top).to.equal(expectedTop);
         expect(overlayElement.style.left).to.equal(expectedLeft);
     });
+
+    it('should remove itself from the DOM when its map is unset', function () {
+        overlayInstance.onAdd();
+
+        overlayInstance.onRemove();
+
+        expect(overlayPaneElement.contains(overlayElement)).to.equal(false);
+    });
 });
