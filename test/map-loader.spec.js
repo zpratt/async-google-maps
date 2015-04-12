@@ -76,92 +76,153 @@ function defineFakeData() {
 }
 
 describe('Google Maps Loader Test Suite', function () {
-    beforeEach(function () {
-        sandbox = sinon.sandbox.create();
-        SyncPromise.setSandbox(sandbox);
+    describe('Loader run before DOMContentLoaded event has fired', function () {
+        beforeEach(function () {
+            sandbox = sinon.sandbox.create();
+            SyncPromise.setSandbox(sandbox);
 
-        defineFakeData();
-        defineStubs();
+            defineFakeData();
+            defineStubs();
 
-        MapLoader = require('../lib/map-loader');
+            document.readyState = 'loading';
+
+            MapLoader = require('../lib/map-loader');
+        });
+
+        afterEach(function () {
+            var cachedModule = path.join(__dirname, '..', 'lib', 'map-loader.js');
+
+            sandbox.restore();
+
+            SyncPromise.unsetSandbox();
+            mapIdleCallback = null;
+            documentReadyCallback = null;
+            document.head.innerHTML = '';
+
+            delete require.cache[cachedModule];
+        });
+
+        it('should add the google maps script to the dom', function () {
+            var scriptEl;
+
+            MapLoader.load(loadOptions);
+            expect(document.head.querySelector('script')).to.equal(null);
+
+            triggerDocumentReady();
+
+            scriptEl = document.head.querySelector('script');
+            expect(scriptEl.src).to.equal(expectedUrl);
+            expect(scriptEl.type).to.equal('text/javascript');
+        });
+
+        it('should resolve the promise once google maps is loaded and the global callback is invoked', function () {
+            var mapLoadPromise = MapLoader.load(loadOptions);
+
+            sinon.assert.notCalled(mapLoadPromise.resolve);
+            global[EXPECTED_GLOBAL_CALLBACK]();
+
+            sinon.assert.calledOnce(mapLoadPromise.resolve);
+        });
+
+        it('should resolve the promise once google maps is loaded and the global callback is invoked', function () {
+            var mapLoadPromise = MapLoader.load(loadOptions);
+
+            sinon.assert.notCalled(mapLoadPromise.resolve);
+            global[EXPECTED_GLOBAL_CALLBACK]();
+
+            sinon.assert.calledOnce(mapLoadPromise.resolve);
+        });
+
+        it('should create a map instance with the supplied options', function () {
+            sinon.assert.notCalled(fakeGoogle.maps.Map);
+            givenGoogleMapsLibHasLoaded();
+
+            MapLoader.create(mapContainer, fakeMapOptions);
+
+            sinon.assert.calledOnce(fakeGoogle.maps.Map);
+            sinon.assert.calledWith(fakeGoogle.maps.Map, mapContainer, fakeMapOptions);
+            sinon.assert.calledWithNew(fakeGoogle.maps.Map);
+        });
+
+        it('should resolve with a google maps instance once the map is idle', function () {
+            var mapIdlePromise;
+
+            givenGoogleMapsLibHasLoaded();
+            mapIdlePromise = MapLoader.create(fakeMapOptions);
+
+            sinon.assert.notCalled(mapIdlePromise.resolve);
+
+            mapIdleCallback();
+
+            sinon.assert.calledOnce(mapIdlePromise.resolve);
+            sinon.assert.calledWith(mapIdlePromise.resolve, fakeMapInstance);
+        });
+
+        it('should expose a hook to know when the google maps API is ready', function () {
+            var mapLoadedPromise = MapLoader.loaded,
+                promiseFromLoad = MapLoader.load(loadOptions);
+
+            expect(mapLoadedPromise).to.equal(promiseFromLoad);
+        });
+
+        it('should only load the google maps API once', function () {
+            sinon.assert.calledOnce(global.Promise);
+            global.Promise.reset();
+
+            MapLoader.load(loadOptions);
+            triggerDocumentReady();
+            MapLoader.load(loadOptions);
+
+            sinon.assert.notCalled(global.Promise);
+            expect(document.getElementsByTagName('script')).to.have.length(1);
+        });
     });
 
-    afterEach(function () {
-        var cachedModule = path.join(__dirname, '..', 'lib', 'map-loader.js');
+    describe('Loader run after DOMContentLoaded event has fired', function () {
+        beforeEach(function () {
+            sandbox = sinon.sandbox.create();
+            SyncPromise.setSandbox(sandbox);
 
-        sandbox.restore();
+            defineFakeData();
+            defineStubs();
 
-        SyncPromise.unsetSandbox();
-        mapIdleCallback = null;
-        documentReadyCallback = null;
-        document.head.innerHTML = '';
+            document.readyState = 'interactive';
 
-        delete require.cache[cachedModule];
-    });
+            MapLoader = require('../lib/map-loader');
+        });
+        afterEach(function () {
+            var cachedModule = path.join(__dirname, '..', 'lib', 'map-loader.js');
 
-    it('should add the google maps script to the dom', function () {
-        var scriptEl;
+            sandbox.restore();
 
-        MapLoader.load(loadOptions);
-        expect(document.head.querySelector('script')).to.equal(null);
+            SyncPromise.unsetSandbox();
+            mapIdleCallback = null;
+            documentReadyCallback = null;
+            document.head.innerHTML = '';
 
-        triggerDocumentReady();
+            delete require.cache[cachedModule];
+        });
 
-        scriptEl = document.head.querySelector('script');
-        expect(scriptEl.src).to.equal(expectedUrl);
-        expect(scriptEl.type).to.equal('text/javascript');
-    });
+        it('should add the google maps script to the dom immediately', function () {
+            var scriptEl;
 
-    it('should resolve the promise once google maps is loaded and the global callback is invoked', function () {
-        var mapLoadPromise = MapLoader.load(loadOptions);
+            expect(document.head.querySelector('script')).to.equal(null);
+            MapLoader.load(loadOptions);
 
-        sinon.assert.notCalled(mapLoadPromise.resolve);
-        global[EXPECTED_GLOBAL_CALLBACK]();
+            scriptEl = document.head.querySelector('script');
+            expect(scriptEl.src).to.equal(expectedUrl);
+            expect(scriptEl.type).to.equal('text/javascript');
+        });
 
-        sinon.assert.calledOnce(mapLoadPromise.resolve);
-    });
+        it('should only load the google maps API once', function () {
+            sinon.assert.calledOnce(global.Promise);
+            global.Promise.reset();
 
-    it('should create a map instance with the supplied options', function () {
-        sinon.assert.notCalled(fakeGoogle.maps.Map);
-        givenGoogleMapsLibHasLoaded();
+            MapLoader.load(loadOptions);
+            MapLoader.load(loadOptions);
 
-        MapLoader.create(mapContainer, fakeMapOptions);
-
-        sinon.assert.calledOnce(fakeGoogle.maps.Map);
-        sinon.assert.calledWith(fakeGoogle.maps.Map, mapContainer, fakeMapOptions);
-        sinon.assert.calledWithNew(fakeGoogle.maps.Map);
-    });
-
-    it('should resolve with a google maps instance once the map is idle', function () {
-        var mapIdlePromise;
-
-        givenGoogleMapsLibHasLoaded();
-        mapIdlePromise = MapLoader.create(fakeMapOptions);
-
-        sinon.assert.notCalled(mapIdlePromise.resolve);
-
-        mapIdleCallback();
-
-        sinon.assert.calledOnce(mapIdlePromise.resolve);
-        sinon.assert.calledWith(mapIdlePromise.resolve, fakeMapInstance);
-    });
-
-    it('should expose a hook to know when the google maps API is ready', function () {
-        var mapLoadedPromise = MapLoader.loaded,
-            promiseFromLoad = MapLoader.load(loadOptions);
-
-        expect(mapLoadedPromise).to.equal(promiseFromLoad);
-    });
-
-    it('should only load the google maps API once', function () {
-        sinon.assert.calledOnce(global.Promise);
-        global.Promise.reset();
-
-        MapLoader.load(loadOptions);
-        triggerDocumentReady();
-        MapLoader.load(loadOptions);
-
-        sinon.assert.notCalled(global.Promise);
-        expect(document.getElementsByTagName('script')).to.have.length(1);
+            sinon.assert.notCalled(global.Promise);
+            expect(document.getElementsByTagName('script')).to.have.length(1);
+        });
     });
 });
