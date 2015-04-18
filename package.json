@@ -1,6 +1,6 @@
 {
   "name": "async-google-maps",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Asynchronous loading and creation of google maps",
   "engines": {
     "node": ">=0.12"
