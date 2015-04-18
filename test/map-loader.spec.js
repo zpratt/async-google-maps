@@ -76,30 +76,32 @@ function defineFakeData() {
 }
 
 describe('Google Maps Loader Test Suite', function () {
-    describe('Loader run before DOMContentLoaded event has fired', function () {
+    beforeEach(function () {
+        sandbox = sinon.sandbox.create();
+        SyncPromise.setSandbox(sandbox);
+
+        defineFakeData();
+        defineStubs();
+    });
+
+    afterEach(function () {
+        var cachedModule = path.join(__dirname, '..', 'lib', 'map-loader.js');
+
+        sandbox.restore();
+
+        SyncPromise.unsetSandbox();
+        mapIdleCallback = null;
+        documentReadyCallback = null;
+        document.head.innerHTML = '';
+
+        delete require.cache[cachedModule];
+    });
+
+    describe('When loaded before DOMContentLoaded event has fired', function () {
         beforeEach(function () {
-            sandbox = sinon.sandbox.create();
-            SyncPromise.setSandbox(sandbox);
-
-            defineFakeData();
-            defineStubs();
-
             document.readyState = 'loading';
 
             MapLoader = require('../lib/map-loader');
-        });
-
-        afterEach(function () {
-            var cachedModule = path.join(__dirname, '..', 'lib', 'map-loader.js');
-
-            sandbox.restore();
-
-            SyncPromise.unsetSandbox();
-            mapIdleCallback = null;
-            documentReadyCallback = null;
-            document.head.innerHTML = '';
-
-            delete require.cache[cachedModule];
         });
 
         it('should add the google maps script to the dom', function () {
@@ -178,29 +180,11 @@ describe('Google Maps Loader Test Suite', function () {
         });
     });
 
-    describe('Loader run after DOMContentLoaded event has fired', function () {
+    describe('When loaded after DOMContentLoaded event has fired', function () {
         beforeEach(function () {
-            sandbox = sinon.sandbox.create();
-            SyncPromise.setSandbox(sandbox);
-
-            defineFakeData();
-            defineStubs();
-
             document.readyState = 'interactive';
 
             MapLoader = require('../lib/map-loader');
-        });
-        afterEach(function () {
-            var cachedModule = path.join(__dirname, '..', 'lib', 'map-loader.js');
-
-            sandbox.restore();
-
-            SyncPromise.unsetSandbox();
-            mapIdleCallback = null;
-            documentReadyCallback = null;
-            document.head.innerHTML = '';
-
-            delete require.cache[cachedModule];
         });
 
         it('should add the google maps script to the dom immediately', function () {
