@@ -10,7 +10,8 @@ var fakeGoogle = require('./helpers/fake-google-maps.js'),
     sinon = require('sinon'),
 
     EXPECTED_GLOBAL_CALLBACK = 'mapLoaded',
-    EXPECTED_URL_TEMPLATE = '//maps.googleapis.com/maps/api/js?v={VERSION}&key={KEY}&callback={CALLBACK}',
+    EXPECTED_KEY_URL_TEMPLATE = '//maps.googleapis.com/maps/api/js?v={VERSION}&key={KEY}&callback={CALLBACK}',
+    EXPECTED_CLIENT_CHANNEL_URL_TEMPLATE = '//maps.googleapis.com/maps/api/js?v={VERSION}&client={CLIENT}&channel={CHANNEL}&callback={CALLBACK}',
 
     sandbox,
 
@@ -18,8 +19,12 @@ var fakeGoogle = require('./helpers/fake-google-maps.js'),
 
     expectedVersion,
     expectedKey,
-    expectedUrl,
+    expectedClient,
+    expectedChannel,
+    expectedKeyUrl,
+    expectedClientChannelUrl,
     loadOptions,
+    loadClientChannelOptions,
     fakeMapOptions,
     mapContainer,
 
@@ -64,14 +69,29 @@ function defineFakeData() {
 
     expectedVersion = '3.20';
     expectedKey = 'somekey';
-    expectedUrl = EXPECTED_URL_TEMPLATE
+    expectedClient = 'myclient';
+    expectedChannel = 'mychannel';
+
+    expectedKeyUrl = EXPECTED_KEY_URL_TEMPLATE
         .replace('{VERSION}', expectedVersion)
         .replace('{KEY}', expectedKey)
+        .replace('{CALLBACK}', EXPECTED_GLOBAL_CALLBACK);
+
+    expectedClientChannelUrl = EXPECTED_CLIENT_CHANNEL_URL_TEMPLATE
+        .replace('{VERSION}', expectedVersion)
+        .replace('{CLIENT}', expectedClient)
+        .replace('{CHANNEL}', expectedChannel)
         .replace('{CALLBACK}', EXPECTED_GLOBAL_CALLBACK);
 
     loadOptions = {
         version: expectedVersion,
         key: expectedKey
+    };
+
+    loadClientChannelOptions = {
+        version: expectedVersion,
+        client: expectedClient,
+        channel: expectedChannel
     };
 }
 
@@ -104,7 +124,7 @@ describe('Google Maps Loader Test Suite', function () {
             MapLoader = require('../lib/map-loader');
         });
 
-        it('should add the google maps script to the dom', function () {
+        it('should add the google maps key url script to the dom by default', function () {
             var scriptEl;
 
             MapLoader.load(loadOptions);
@@ -113,7 +133,20 @@ describe('Google Maps Loader Test Suite', function () {
             triggerDocumentReady();
 
             scriptEl = document.head.querySelector('script');
-            expect(scriptEl.src).to.equal(expectedUrl);
+            expect(scriptEl.src).to.equal(expectedKeyUrl);
+            expect(scriptEl.type).to.equal('text/javascript');
+        });
+
+        it('should add the google maps client/channel url script to the dom if client/channel found', function () {
+            var scriptEl;
+
+            MapLoader.load(loadClientChannelOptions);
+            expect(document.head.querySelector('script')).to.equal(null);
+
+            triggerDocumentReady();
+
+            scriptEl = document.head.querySelector('script');
+            expect(scriptEl.src).to.equal(expectedClientChannelUrl);
             expect(scriptEl.type).to.equal('text/javascript');
         });
 
@@ -194,7 +227,7 @@ describe('Google Maps Loader Test Suite', function () {
             MapLoader.load(loadOptions);
 
             scriptEl = document.head.querySelector('script');
-            expect(scriptEl.src).to.equal(expectedUrl);
+            expect(scriptEl.src).to.equal(expectedKeyUrl);
             expect(scriptEl.type).to.equal('text/javascript');
         });
 
